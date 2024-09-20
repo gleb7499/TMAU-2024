@@ -6,7 +6,7 @@ using namespace std;
 
 void get_liner_model();
 void get_nonlinear_model();
-bool choice_input(const int &choice);
+bool choice_input(int &choice);
 
 int main() {
     void (*point[])() = { []() { exit(0); }, get_liner_model, get_nonlinear_model};
