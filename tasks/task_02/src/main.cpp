@@ -1,16 +1,39 @@
+#include <iostream>
+#include <vector>
 #include "models.h"
 #include "PID.h"
-#include <iostream>
 
 using namespace std;
 
+/**
+ * @file main.cpp
+ *
+ * @brief The program implements a controller for a system with two models,
+ * a linear and a non-linear one.
+ *
+ * @author Loginov Gleb
+ *
+ * @version 1.0.0
+ *
+ * @date 21-09-2024
+ */
+
+void start();
 bool choice_input(int &choice);
+PID get_pig();
 LinearModel get_liner_model();
 NonLinearModel get_nonlinear_model();
-PID get_pig();
-void start();
 vector <double> get_error(const vector <double>& temps_linear, const vector <double>& temps_nonlinear);
 
+/**
+ * @brief The main function.
+ *
+ * @return 0 if everything is OK.
+ */
+
+/**
+ * @brief The array of functions to switch between them.
+ */
 int main() {
     void (*point[])() = { []() { exit(0); }, start};
     int choice;
@@ -25,6 +48,12 @@ int main() {
     return 0;
 }
 
+/**
+ * @brief The function to start the program.
+ *
+ * The function starts the program, input data for the Linear and Nonlinear models,
+ * calculate the error, calculate the control signal by PID and output the results.
+ */
 void start() {
     cout << "\tFill in the data for the Linear model\n";
     LinearModel liner_model = get_liner_model();
@@ -59,6 +88,14 @@ void start() {
     }
 }
 
+/**
+ * @brief The template function to input value.
+ *
+ * @param value The value to input.
+ * @param name The name of the value.
+ *
+ * @return True if everything is OK.
+ */
 template<typename T> bool input_value(T &value, const string &name) {
     while (true) {
         cout << "Input " << name << ": ";
@@ -73,6 +110,11 @@ template<typename T> bool input_value(T &value, const string &name) {
     }
 }
 
+/**
+ * @brief The function to input data for the Linear Model.
+ *
+ * @return The Linear Model.
+ */
 LinearModel get_liner_model() {
     double A, B, current_temperature, warm;
     int time;
@@ -87,6 +129,11 @@ LinearModel get_liner_model() {
     return model;
 }
 
+/**
+ * @brief The function to input data for the Nonlinear Model.
+ *
+ * @return The Nonlinear Model.
+ */
 NonLinearModel get_nonlinear_model() {
     double A, B, C, D, current_temperature, warm;
     int time;
@@ -103,6 +150,14 @@ NonLinearModel get_nonlinear_model() {
     return model;
 }
 
+/**
+ * @brief The function to calculate the error.
+ *
+ * @param temps_linear The temperatures of the Linear Model.
+ * @param temps_nonlinear The temperatures of the Nonlinear Model.
+ *
+ * @return The error.
+ */
 vector <double> get_error(const vector <double>& temps_linear, const vector <double>& temps_nonlinear) {
     if (temps_linear.size() != temps_nonlinear.size()) {
         cerr << "\n\a\t\t*The sizes of the models are not equal*\n\n";
@@ -114,6 +169,11 @@ vector <double> get_error(const vector <double>& temps_linear, const vector <dou
     return error;
 }
 
+/**
+ * @brief The function to input data for the PID.
+ *
+ * @return The PID.
+ */
 PID get_pig() {
     double P, I, D;
     input_value(P, "P");
@@ -123,6 +183,13 @@ PID get_pig() {
     return pid;
 }
 
+/**
+ * @brief The function to input choice.
+ *
+ * @param choice The choice.
+ *
+ * @return True if everything is OK.
+ */
 bool choice_input(int &choice) {
     while (true) {
         if (input_value(choice, "choice")) {
