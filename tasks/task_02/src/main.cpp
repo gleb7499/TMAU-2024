@@ -20,10 +20,10 @@ using namespace std;
 
 void start();
 bool choice_input(int &choice);
-PID get_pig();
-LinearModel get_liner_model();
-NonLinearModel get_nonlinear_model();
-vector <double> get_error(const vector <double>& temps_linear, const vector <double>& temps_nonlinear);
+LinearModel get_liner_model(const int &T0);
+NonLinearModel get_nonlinear_model(const int &T0);
+template<typename T> bool input_value(T &value, const string &name);
+void output(const vector <vector<double>>& control_signals, const string& name);
 
 /**
  * @brief The main function.
@@ -55,36 +55,55 @@ int main() {
  * calculate the error, calculate the control signal by PID and output the results.
  */
 void start() {
-    cout << "\tFill in the data for the Linear model\n";
-    LinearModel liner_model = get_liner_model();
-    cout << "\tFill in the data for the Nonlinear model\n";
-    NonLinearModel non_liner_model = get_nonlinear_model();
+    double w;
+    int T0;
 
-    cout << "\tFill in the data for the Nonlinear model\n";
-    PID pid = get_pig();
+    cout << "Enter the algorithm of the system functioning\n";
+    input_value(w, "w(t)");
+
+    cout << "Enter the step\n";
+    input_value(T0, "T0");
+
+    cout << "\tFill in the data for the Linear model\n";
+    LinearModel liner_model = get_liner_model(T0);
 
     vector <double> temps_linear = liner_model.getTemp();
+
+    PID pid_liner, pid_nonlinear;
+
+    pid_liner.calculate(w, T0, temps_linear);
+
+    vector <vector<double>> control_signals_liner = pid_liner.getControlSignals();
+
+    cout << "\tFill in the data for the Nonlinear model\n";
+    NonLinearModel non_liner_model = get_nonlinear_model(T0);
+
     vector <double> temps_nonlinear = non_liner_model.getTemp();
-    vector <double> error = get_error(temps_linear, temps_nonlinear);
 
-    pid.calculate(error);
+    pid_nonlinear.calculate(w, T0, temps_nonlinear);
 
-    vector <double> control_signals = pid.getControlSignals();
+    vector <vector<double>> control_signals_nonlinear = pid_nonlinear.getControlSignals();
 
-    // Output
+    output(control_signals_liner, "Linear model");
+    output(control_signals_nonlinear, "Nonlinear model");
+    
+}
+
+void output(const vector <vector<double>>& control_signals, const string& name) {
+    cout << "\n\t\t\t\t\t\t\t\tRESULTS\n\n";
+    cout << "\t\t\t\t\t\t\t" << name << "\n\n";
     cout.setf(ios::left);
-    cout << setw(10) << "TIME";
-    cout << setw(17) << "LINAR MODEL";
-    cout << setw(20) << "NONLINAR MODEL";
-    cout << setw(17) << "ERROR";
-    cout << setw(19) << "CONTROL SIGNAL" << endl;
-    cout << setfill('=') << setw(80) << "" << setfill(' ') << endl;
-    for (int i = 0; i < control_signals.size(); ++i) {
-        cout << setw(10) << (i + 1);
-        cout << setw(17) << temps_linear[i];
-        cout << setw(20) << temps_nonlinear[i];
-        cout << setw(17) << error[i];
-        cout << setw(19) << control_signals[i] << endl;
+    cout << setw(15) << "TIME (T0)";
+    cout << setw(20) << "DEVIATION (e)";
+    cout << setw(27) << "OUTPUT VARIABLE (Yt)";
+    cout << setw(35) << "CONTROLLING INFLUENCE (Uk)" << endl;
+    cout << setfill('=') << setw(85) << "" << setfill(' ') << endl;
+    int i = 1;
+    for (const auto& signal : control_signals) {
+        cout << setw(15) << i++;
+        cout << setw(20) << signal[0];
+        cout << setw(27) << signal[1];
+        cout << setw(35) << signal[2] << endl;
     }
 }
 
@@ -115,17 +134,14 @@ template<typename T> bool input_value(T &value, const string &name) {
  *
  * @return The Linear Model.
  */
-LinearModel get_liner_model() {
+LinearModel get_liner_model(const int& T0) {
     double A, B, current_temperature, warm;
-    int time;
     input_value(A, "A");
     input_value(B, "B");
     input_value(current_temperature, "current_temperature");
     input_value(warm, "warm");
-    input_value(time, "time");
     LinearModel model(A, B, current_temperature, warm);
-    model.calculate(time);
-    model.print();
+    model.calculate(T0);
     return model;
 }
 
@@ -134,53 +150,17 @@ LinearModel get_liner_model() {
  *
  * @return The Nonlinear Model.
  */
-NonLinearModel get_nonlinear_model() {
+NonLinearModel get_nonlinear_model(const int& T0) {
     double A, B, C, D, current_temperature, warm;
-    int time;
     input_value(A, "A");
     input_value(B, "B");
     input_value(C, "C");
     input_value(D, "D");
     input_value(current_temperature, "current_temperature");
     input_value(warm, "warm");
-    input_value(time, "time");
     NonLinearModel model(A, B, C, D, current_temperature, warm);
-    model.calculate(time);
-    model.print();
+    model.calculate(T0);
     return model;
-}
-
-/**
- * @brief The function to calculate the error.
- *
- * @param temps_linear The temperatures of the Linear Model.
- * @param temps_nonlinear The temperatures of the Nonlinear Model.
- *
- * @return The error.
- */
-vector <double> get_error(const vector <double>& temps_linear, const vector <double>& temps_nonlinear) {
-    if (temps_linear.size() != temps_nonlinear.size()) {
-        cerr << "\n\a\t\t*The sizes of the models are not equal*\n\n";
-    }
-    vector <double> error;
-    for (int i = 0; i < temps_linear.size() && i < temps_nonlinear.size(); ++i) {
-        error.push_back(temps_linear[i] - temps_nonlinear[i]);
-    }
-    return error;
-}
-
-/**
- * @brief The function to input data for the PID.
- *
- * @return The PID.
- */
-PID get_pig() {
-    double P, I, D;
-    input_value(P, "P");
-    input_value(I, "I");
-    input_value(D, "D");
-    PID pid(P, I, D);
-    return pid;
 }
 
 /**

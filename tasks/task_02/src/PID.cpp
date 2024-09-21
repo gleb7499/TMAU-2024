@@ -11,35 +11,34 @@
  */
 
 #include "PID.h"
-
-/**
- * @brief The constructor of the PID controller.
- *
- * @param K The coefficient P in the PID controller.
- * @param T The coefficient I in the PID controller.
- * @param TD The coefficient D in the PID controller.
- */
-
-PID::PID(double K, double T, double TD) : kp(K), ki(T), kd(TD) {}
+#include "models.h"
 
 /**
  * @brief The method to calculate the control signal by PID.
  *
  * @param error The vector of errors.
  */
-void PID::calculate(const std::vector<double> &error) {
-    double integralError = 0.0;
-    double derivativeError = 0.0;
-    double controlSignal = 0.0;
-    double previous_error = 0.0;
-    for (int i = 0; i < error.size(); ++i) {
-        
-
-        integralError += error[i];
-        derivativeError = error[i] - previous_error;
-        previous_error = error[i];
-        controlSignal = kp * error[i] + ki * integralError + kd * derivativeError;
-        this->control_signals.push_back(controlSignal);
+void PID::calculate(const double& w, const double& T0, const std::vector<double>& temp) {
+    double q0;
+    double q1;
+    double q2;
+    double e0;
+    double e1 = 0;
+    double e2 = 0;
+    double Uk;
+    double delta_Uk;
+    double Uk_1 = 0;
+    for (const auto& y0 : temp) {
+        e0 = w - y0;
+        q0 = K * (1 + TD / T0);
+        q1 = -K * (1 + 2 * TD / T0 - T0 / T);
+        q2 = K * TD / T0;
+        delta_Uk = q0 * e0 + q1 * e1 + q2 * e2;
+        Uk = Uk_1 + delta_Uk;
+        Uk_1 = Uk;
+        e2 = e1;
+        e1 = e0;
+        res_liner.push_back({e0, y0, Uk});
     }
 }
 
@@ -48,7 +47,7 @@ void PID::calculate(const std::vector<double> &error) {
  *
  * @return The vector of control signals.
  */
-std::vector<double> PID::getControlSignals() const {
-    return this->control_signals;
+std::vector<std::vector<double>> PID::getControlSignals() const {
+    return this->res_liner;
 }
 

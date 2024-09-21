@@ -24,35 +24,27 @@
 class PID {
 private:
     /// The coefficient K in the PID controller.
-    double kp;
+    const double K = 10;
     /// The coefficient T in the PID controller.
-    double ki;
+    const double T = 0.1;
     /// The coefficient TD in the PID controller.
-    double kd;
+    const double TD = 50;
     /// The vector of control signals.
-    std::vector <double> control_signals;
+    std::vector<std::vector<double>> res_liner;
 
 public:
-    /**
-     * @brief The constructor of the PID controller.
-     *
-     * @param K The coefficient P in the PID controller.
-     * @param T The coefficient I in the PID controller.
-     * @param TD The coefficient D in the PID controller.
-     */
-    PID(double K, double T, double TD);
     /**
      * @brief The method to calculate the control signal by PID.
      *
      * @param error The vector of errors.
      */
-    void calculate(const std::vector <double>& error);
+    void calculate(const double& w, const double& T0, const std::vector <double>& temps_linear);
     /**
      * @brief The method to get the control signals.
      *
      * @return The vector of control signals.
      */
-    std::vector<double> getControlSignals() const;
+    std::vector<std::vector<double>> getControlSignals() const;
 };
 
 #endif //PID_S
