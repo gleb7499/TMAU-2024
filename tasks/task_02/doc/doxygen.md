@@ -225,33 +225,35 @@ The class contains the method to calculate the control signal by [PID](#class_p_
 
  Members                        | Descriptions                                
 --------------------------------|---------------------------------------------
-`public  `[`PID`](#class_p_i_d_1a46b78a3e055a6603d1b7980e9320ad81)`(double kp,double ki,double kd)` | The constructor of the [PID](#class_p_i_d) controller.
-`public void `[`calculate`](#class_p_i_d_1ac35ae6197f0c54b7797a6e008b3cc31e)`(const std::vector< double > & error)` | The method to calculate the control signal by [PID](#class_p_i_d).
-`public std::vector< double > `[`getControlSignals`](#class_p_i_d_1a0dcd91dc972ebf77ec88843565f0b632)`() const` | The method to get the control signals.
+`public void `[`calculate`](#class_p_i_d_1ae89c0bb07b0d62a0ea2569ec3338a960)`(const double & w,const double & T0,const std::vector< double > & temps_linear)` | The method to calculate the control signal by [PID](#class_p_i_d).
+`public std::vector< std::vector< double > > `[`getControlSignals`](#class_p_i_d_1a4f18b22156745f389a97f73ed4c91e39)`() const` | The method to get the control signals.
 
 ## Members
 
-#### `public  `[`PID`](#class_p_i_d_1a46b78a3e055a6603d1b7980e9320ad81)`(double kp,double ki,double kd)` 
-
-The constructor of the [PID](#class_p_i_d) controller.
-
-#### Parameters
-* `kp` The coefficient P in the [PID](#class_p_i_d) controller. 
-
-* `ki` The coefficient I in the [PID](#class_p_i_d) controller. 
-
-* `kd` The coefficient D in the [PID](#class_p_i_d) controller.
-
-#### `public void `[`calculate`](#class_p_i_d_1ac35ae6197f0c54b7797a6e008b3cc31e)`(const std::vector< double > & error)` 
+#### `public void `[`calculate`](#class_p_i_d_1ae89c0bb07b0d62a0ea2569ec3338a960)`(const double & w,const double & T0,const std::vector< double > & temps_linear)` 
 
 The method to calculate the control signal by [PID](#class_p_i_d).
 
 #### Parameters
 * `error` The vector of errors.
 
-#### `public std::vector< double > `[`getControlSignals`](#class_p_i_d_1a0dcd91dc972ebf77ec88843565f0b632)`() const` 
+The method calculates the control signal by [PID](#class_p_i_d) using the formulas: Uk = Uk_1 + delta_Uk delta_Uk = q0 * e0 + q1 * e1 + q2 * e2 q0 = K * (1 + TD / T0) q1 = -K * (1 + 2 * TD / T0 - T0 / T) q2 = K * TD / T0
+
+#### Parameters
+* `w` The desired value of the output signal. 
+
+* `T0` The time step. 
+
+* `temp` The vector of output signals.
+
+#### `public std::vector< std::vector< double > > `[`getControlSignals`](#class_p_i_d_1a4f18b22156745f389a97f73ed4c91e39)`() const` 
 
 The method to get the control signals.
+
+#### Returns
+The vector of control signals.
+
+The method returns the vector of control signals.
 
 #### Returns
 The vector of control signals.

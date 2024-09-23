@@ -16,7 +16,16 @@
 /**
  * @brief The method to calculate the control signal by PID.
  *
- * @param error The vector of errors.
+ * The method calculates the control signal by PID using the formulas:
+ * Uk = Uk_1 + delta_Uk
+ * delta_Uk = q0 * e0 + q1 * e1 + q2 * e2
+ * q0 = K * (1 + TD / T0)
+ * q1 = -K * (1 + 2 * TD / T0 - T0 / T)
+ * q2 = K * TD / T0
+ *
+ * @param w The desired value of the output signal.
+ * @param T0 The time step.
+ * @param temp The vector of output signals.
  */
 void PID::calculate(const double& w, const double& T0, const std::vector<double>& temp) {
     double q0;
@@ -44,6 +53,8 @@ void PID::calculate(const double& w, const double& T0, const std::vector<double>
 
 /**
  * @brief The method to get the control signals.
+ *
+ * The method returns the vector of control signals.
  *
  * @return The vector of control signals.
  */
