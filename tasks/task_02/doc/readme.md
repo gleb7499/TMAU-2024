@@ -132,7 +132,7 @@ The resulting file is [doxygen.md](doxygen.md)
 
 ## The source code
 
-#### The source code is located in the [src folder](/trunk/as0006315/task_01/src).
+#### The source code is located in the [src folder](/trunk/as0006315/task_02/src).
 
 - [CMakeLists.txt](/trunk/as0006315/task_01/src/CMakeLists.txt) - this is a file that contains CMake commands to control the project build process.
 - [models.h](/trunk/as0006315/task_01/src/models.h) - header file, contains functions declarations for linear and nonlinear models simulation.
